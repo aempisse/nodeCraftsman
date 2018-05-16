@@ -29,8 +29,8 @@ var FilesizeWatcher = function(path) {
 					self.callbacks['shrank'](self.lastfilesize - stats.size);
 					self.lastfilesize = stats.size;
 				}
-			}, 1000);
-		});
+			});
+		}, 1000);
 };
 
 FilesizeWatcher.prototype.on = function(eventType, callback) {
