@@ -1,9 +1,25 @@
 let request = require('request')
 let dbSession = require('../../src/backend/dbSession.js')
-let resetDatabase =require('../resetDatabase.js')
+let Server = require('../../src/backend/server.js').Server
+let resetDatabase = require('../resetDatabase.js')
 let async = require('async')
 
 describe('The API', () => {
+
+	let server
+
+	beforeEach((done) => {
+		server = Server('8081')
+		server.listen((err) => {
+			resetDatabase(dbSession, () => { done(err) })
+		})
+	})
+
+	afterEach((done) => {
+		server.close(() => {
+			resetDatabase(dbSession, () => { done(err) })
+		})
+	})
 
 	it('should respond to a GET request at /api/keywords/', (done) => {
 		let expected = {"_items": [
@@ -13,7 +29,6 @@ describe('The API', () => {
 		]}
 
 		async.series([
-			(callback) => { resetDatabase(dbSession, callback) },
 
 			(callback) => {
 				dbSession.insert(
@@ -39,10 +54,10 @@ describe('The API', () => {
 				)
 			}],
 
-			(err, result) => {
+			(err, results) => {
 				request.get(
 					{
-						'url': 'http://localhost:8080/api/keywords/',
+						'url': 'http://localhost:8081/api/keywords/',
 						'json': true
 					},
 					(err, res, body) => {
